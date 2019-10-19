@@ -10,6 +10,7 @@ var MHOST = '192.168.0.123';
 var SPORT = 8080;
 var SHOST = '192.168.0.147';
 //User Data
+var heart = heartbeats.createHeart(60000);
 var username = 'nescu';
 var req;
 var ServerDelay; 
@@ -57,8 +58,12 @@ function send(){
     });
     return req;
 };
+
 options.path = '/register?username='+username+'&ip='+MHOST+'&port='+MPORT;
-send().end();   //Format the request and ends it
+heart.createEvent(1,(count,last)=>{
+    send().end();
+})
+   //Format the request and ends it
 //UDP-P2P-Listener
 var server = dgram.createSocket('udp4');
 server.on('listening', function () {
