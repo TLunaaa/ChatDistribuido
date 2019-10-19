@@ -3,7 +3,7 @@ const net = require('net');
 var dgram = require('dgram');
 
 
-//Client DataSSS
+//Client Data
 var MPORT = 33333;
 var MHOST = '192.168.0.123';
 //HTTP Server Data
@@ -36,7 +36,6 @@ client.on('data', function(data) {
 const options = {
     hostname: SHOST,
     port: SPORT,
-    path: '/register',
     method: 'GET',
     headers: {
         'Content-Type': 'text/plain',
@@ -66,3 +65,9 @@ server.on('listening', function () {
     var address = server.address();
     console.log('UDP Server listening on ' + address.address + ":" + address.port);
 });
+server.on('message', function (message, remote) {
+    console.log(remote.address + ':' + remote.port +' - ' + message);
+
+});
+server.bind(PORT, HOST);
+
