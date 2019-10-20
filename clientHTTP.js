@@ -3,6 +3,7 @@ const net = require('net');
 const dgram = require('dgram');
 const heartbeats = require('heartbeats');
 const readlinesync = require('readline-sync');
+const readline = require('readline');
 
 //Client Data
 var MPORT = 33333;
@@ -11,10 +12,10 @@ var MHOST = '192.168.0.65';
 var SPORT = 8080;
 var SHOST = '192.168.0.147';
 //UDP Server Data
-var UPORT = 6565;
-var UHOST = '192.168.0.147';
+var UPORT = 33335;
+var UHOST = '192.168.0.123';
 //Variables
-var heart = heartbeats.createHeart(60000);
+var heart = heartbeats.createHeart(10000);
 var clientesConectados = [];
 var username;
 var req;
@@ -76,9 +77,9 @@ function register(){
 username = readlinesync.question('Ingrese su nombre de usuario: ');
 console.log("Bienvenido "+username);
 options.path = '/register?username='+username+'&ip='+MHOST+'&port='+SPORT;
-register().end();
+//register().end();
 heart.createEvent(1,(count,last)=>{
-    register().end();
+    //register().end();
 })
 
 //TODO connect with all clients.
@@ -87,13 +88,9 @@ heart.createEvent(1,(count,last)=>{
 
 
 
-   //Format the request and ends it
+//Format the request and ends it
 //UDP-P2P-Listener
 var server = dgram.createSocket('udp4');
-server.on('listening', function () {
-    var address = server.address();
-    //console.log('UDP Server listening on ' + address.address + ":" + address.port);
-});
 server.on('message', function (message, remote) {
     var datos = JSON.parse(message);
     if ('username' in datos){
@@ -103,18 +100,19 @@ server.on('message', function (message, remote) {
 });
 server.bind(UPORT, UHOST);
 //UDP-P2P-Sender
-udpmsg = readlinesync.question('Desea enviar?');
+var client = dgram.createSocket('udp4');
+udpmsg = readline.question('¿Desea enviar?');
 if (udpmsg == '1'){
-    udpmsg = new Buffer('Welcome welcome');
-    var client = dgram.createSocket('udp4');
-    var message = {
-    msg : 'welcome welcome',
-    username : 'nes'
-    }
-    client.send(message, 0, message.length, UHOST, '192.168.0.65', function(err, bytes) {
-        if (err) throw err;
-        console.log('UDP message sent to ' + HOST +':'+ PORT);
-        client.close();
+
+    var message = JSON.stringify({
+        msg : readline.question('Mensaje->[All]:'),
+        username : username
+    });
+    clientesConectados.forEach(element => {
+        client.send(message, 0, message.length, UPORT, element.ip, function(err, bytes) {
+            if (err) throw err;
+            client.close();
+        });
     });
 }
 
