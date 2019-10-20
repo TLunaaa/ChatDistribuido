@@ -6,10 +6,10 @@ const readlinesync = require('readline-sync');
 
 //Client Data
 var MPORT = 33333;
-var MHOST = '192.168.0.147';
+var MHOST = '192.168.0.65';
 //HTTP Server Data
 var SPORT = 8080;
-var SHOST = '192.168.0.65';
+var SHOST = '192.168.0.147';
 //Variables
 var heart = heartbeats.createHeart(60000);
 var clientesConectados = [];

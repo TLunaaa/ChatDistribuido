@@ -1,21 +1,21 @@
 const http = require('http');
 const net = require('./servidor-net');
 const url = require('url');
+const heartbeat = require('heartbeats');
 
 var clientesActivos = [];
 
 const server = http.createServer((request,response) => {
-    console.log('somebody connected');
+    console.log('Conexion establecida');
    if(request.method === 'GET'){
         response.statusCode = 200;
-        request.on('connect',()=>{
-            response.write("Conexion establecida");
-        })
         getURL(request.url)
         let data = JSON.stringify(clientesActivos);
         response.end(data);
    }
 }).listen(8080);
+
+var heart = heartbeat.createHeart(5000);
 
 
 function getURL(pathurl){
@@ -30,19 +30,20 @@ function getURL(pathurl){
                 username : username,
                 ip: ip,
                 port : port,
-                timestamp: (new Date()).toString(),
+                timestamp: (new Date()).getTime(),
             }
             let esta = false;
-            clientesActivos.forEach((element)=>{
-                let clientAux = JSON.parse(element);
+            clientesActivos.forEach(element=>{
+                let clientAux = element;
                 if(clientAux.ip == ip ){
                     esta = true;
-                    clientAux.timestamp = (new Date()).toString();
+                    clientAux.timestamp = (new Date()).getTime();
                 }
             })
             if(esta == false){
                 clientesActivos.push(cliente);
             }
+            console.log(clientesActivos);
         }
     }
 }
