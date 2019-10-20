@@ -7,10 +7,10 @@ const readline = require('readline');
 
 //Client Data
 var MPORT = 33333;
-var MHOST = '192.168.0.65';
+var MHOST = '192.168.0.123';
 //HTTP Server Data
 var SPORT = 8080;
-var SHOST = '192.168.0.147';
+var SHOST = '192.168.0.65';
 //UDP Server Data
 var UPORT = 33335;
 var UHOST = '192.168.0.123';
