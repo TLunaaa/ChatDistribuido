@@ -10,6 +10,9 @@ var MHOST = '192.168.0.65';
 //HTTP Server Data
 var SPORT = 8080;
 var SHOST = '192.168.0.147';
+//UDP Server Data
+var UPORT = 6565;
+var UHOST = '192.168.0.147';
 //Variables
 var heart = heartbeats.createHeart(60000);
 var clientesConectados = [];
@@ -86,23 +89,33 @@ heart.createEvent(1,(count,last)=>{
 
    //Format the request and ends it
 //UDP-P2P-Listener
-/*var server = dgram.createSocket('udp4');
+var server = dgram.createSocket('udp4');
 server.on('listening', function () {
     var address = server.address();
-    console.log('UDP Server listening on ' + address.address + ":" + address.port);
+    //console.log('UDP Server listening on ' + address.address + ":" + address.port);
 });
 server.on('message', function (message, remote) {
-    console.log(remote.address + ':' + remote.port +' - ' + message);
-
+    var datos = JSON.parse(message);
+    if ('username' in datos){
+        udpName = datos.username;
+        console.log("Conected with: "+datos.username+" in: "+remote.address+":"+remote.port+":"+datos.msg);
+    }
 });
-server.bind(MPORT, MHOST);
+server.bind(UPORT, UHOST);
 //UDP-P2P-Sender
-var message = new Buffer('My KungFu is Good!');
+udpmsg = readlinesync.question('Desea enviar?');
+if (udpmsg == '1'){
+    udpmsg = new Buffer('Welcome welcome');
+    var client = dgram.createSocket('udp4');
+    var message = {
+    msg : 'welcome welcome',
+    username : 'nes'
+    }
+    client.send(message, 0, message.length, UHOST, '192.168.0.65', function(err, bytes) {
+        if (err) throw err;
+        console.log('UDP message sent to ' + HOST +':'+ PORT);
+        client.close();
+    });
+}
 
-var client = dgram.createSocket('udp4');
-client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {
-    if (err) throw err;
-    console.log('UDP message sent to ' + HOST +':'+ PORT);
-    client.close();
-});
-*/
+
