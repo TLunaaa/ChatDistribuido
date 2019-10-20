@@ -30,8 +30,20 @@ function getURL(pathurl){
                 username : username,
                 ip: ip,
                 port : port,
+                timestamp: (new Date()).toString(),
             }
-            clientesActivos.push(cliente);
+            let esta = false;
+            clientesActivos.forEach((element)=>{
+                let clientAux = JSON.parse(element);
+                if(clientAux.ip == ip ){
+                    esta = true;
+                    clientAux.timestamp = (new Date()).toString();
+                }
+            })
+            if(esta == false){
+                clientesActivos.push(cliente);
+            }
         }
     }
 }
+
