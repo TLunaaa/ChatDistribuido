@@ -2,11 +2,12 @@ const http = require('http');
 const net = require('./servidor-net');
 const url = require('url');
 const heartbeat = require('heartbeats');
+const List = require('collections/list')
 
-var clientesActivos = [];
+var clientesActivos = new List();
 
 const server = http.createServer((request,response) => {
-    console.log('Conexion establecida');
+    console.log('>Conexion establecida con: '+ request.socket.remoteAddress);
    if(request.method === 'GET'){
         response.statusCode = 200;
         getURL(request.url)
@@ -16,13 +17,21 @@ const server = http.createServer((request,response) => {
 }).listen(8080);
 
 var heart = heartbeat.createHeart(5000);
-
+heart.createEvent(1,(count,last)=>{
+    let ts = (new Date()).getTime();
+    clientesActivos.forEach((element)=>{
+        if(ts - element.timestamp >= 90000){
+            console.log(">El cliente "+ element.ip +" esta ahora inactivo");
+            clientesActivos.delete(element);
+            console.log(">Clientes activos: "+clientesActivos.length);
+        }
+    })
+})
 
 function getURL(pathurl){
     if(typeof pathurl === 'string'){
         parsedURL = url.parse(pathurl);
         if(parsedURL.pathname === '/register'){
-            console.log(parsedURL.query)
             let username = (parsedURL.query.split('&')[0]).split('=')[1];
             let ip = (parsedURL.query.split('&')[1]).split('=')[1];
             let port = (parsedURL.query.split('&')[2]).split('=')[1];
@@ -34,16 +43,17 @@ function getURL(pathurl){
             }
             let esta = false;
             clientesActivos.forEach(element=>{
-                let clientAux = element;
-                if(clientAux.ip == ip ){
+                if(element.ip == ip ){
                     esta = true;
-                    clientAux.timestamp = (new Date()).getTime();
+                    element.timestamp = (new Date()).getTime();
                 }
             })
             if(esta == false){
                 clientesActivos.push(cliente);
             }
-            console.log(clientesActivos);
+            /*clientesActivos.forEach((element)=>{
+                console.log(element);
+            })*/
         }
     }
 }
