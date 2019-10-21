@@ -27,23 +27,23 @@ var t1,t2,t3,t4;
 
 function TCPconnection(){
     var client = new net.Socket();  //Devuelve un Socket
-    console.log("Trying to connect to "+SHOST+":"+MPORT+" via TCP");
+    //console.log("Trying to connect to "+SHOST+":"+MPORT+" via TCP");
     client.connect(33333,SHOST, function() {
-        console.log(">>Connection established");
+        //console.log(">>Connection established");
         t1 = new Date().getTime();
         client.write(t1.toString());
     }); 
     client.on('data', function(data) {
-        console.log(">Receiving Data");
+        //console.log(">Receiving Data");
         t4 = (new Date()).getTime();
         t2 = data.toString().split(',')[0];
         t3 = data.toString().split(',')[1];
         
         ServerOffset = ((parseInt(t2)-parseInt(t1))+(parseInt(t3)-parseInt(t4)))/2;
         ServerDelay  = ((parseInt(t2)-parseInt(t1))+(parseInt(t4)-parseInt(t3)))/2;
-        console.log("Offset:"+ServerOffset+" Delay:"+ServerDelay);
+        //console.log("Offset:"+ServerOffset+" Delay:"+ServerDelay);
         client.destroy();
-        console.log(">>Disconnected");
+        //console.log(">>Disconnected");
     });
 }
 //HTTP Register---------------------------------
@@ -74,6 +74,14 @@ function register(){
     return req;
 };
 
+function showConectados(){
+    var s = "";
+    clientesConectados.forEach(element => {
+        s+=element.username.toString()+", ";
+    });
+    console.log("Conectados: "+s);
+}
+
 username = readlinesync.question('Ingrese su nombre de usuario: ');
 console.log("Bienvenido "+username);
 options.path = '/register?username='+username+'&ip='+MHOST+'&port='+SPORT;
@@ -103,12 +111,11 @@ server.on('message', function (message, remote) {
 server.bind(UPORT, UHOST);
 //UDP-P2P-Sender
 var client = dgram.createSocket('udp4');
-console.log("Type /All to send a global message, /exit to exit the chat");
+console.log("Type /all to send a global message, /exit to exit the chat or /conectados to see online users.");
 rl.on('line',(answer)=>{
     if (answer.toLowerCase() == '/all'){
         rl.question('Mensaje->[All]:',(answer)=>{
             var message = JSON.stringify({
-                //asi deberias ser el formato de envio de mensaje ->
                 from: username,
                 to : 'all',
                 message: answer,
@@ -118,7 +125,6 @@ rl.on('line',(answer)=>{
             clientesConectados.forEach(element => {
                 client.send(message, 0, message.length, UPORT, element.ip, function(err, bytes) {
                     if (err) throw err;
-                    
                 });
             });
         });
@@ -126,6 +132,12 @@ rl.on('line',(answer)=>{
         if (answer == '/exit'){
             client.close();
             rl.close();
+        }
+        else{
+            if (answer == '/conectados')
+                showConectados();
+            else
+                console.log("Error: Comando desconocido: "+answer);
         }
             
     }
