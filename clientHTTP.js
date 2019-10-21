@@ -11,12 +11,12 @@ var MPORT = 33333;
 var MHOST = getLocalIP()[0].toString();
 //HTTP Server Data
 var SPORT = 8080;
-var SHOST = '192.168.0.252';
+var SHOST = '192.168.43.90';
 //UDP Server Data
 var UPORT = 33335;
 var UHOST = getLocalIP()[0].toString();
 //Variables
-var heart = heartbeats.createHeart(10000);
+var heart = heartbeats.createHeart(60000);
 var clientesConectados = [];
 var username;
 var req;
@@ -137,7 +137,7 @@ server.on('message', function (message, remote) {
 server.bind(UPORT, UHOST);
 //UDP-P2P-Sender
 var client = dgram.createSocket('udp4');
-console.log("Type /all to send a global message, /exit to exit the chat or /con to see online users.");
+console.log("Type /all to send a global message, /con to see online users or /netstat to see network stats.");
 rl.on('line',(answer)=>{
     if (answer.toLowerCase() == '/all'){
         rl.question('Mensaje->[All]:',(answer)=>{
@@ -157,9 +157,10 @@ rl.on('line',(answer)=>{
             });
         });
     }else{
-        if (answer == '/exit'){
-            client.close();
-            rl.close();
+        if (answer == '/netstat'){
+            //client.close();
+            //rl.close();
+            console.log('Delay: '+ServerDelay+"ms | Offset: "+ServerOffset+"ms.");
         }
         else{
             if (answer == '/con')
