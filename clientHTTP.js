@@ -46,7 +46,7 @@ function TCPconnection(){
         //console.log(">>Disconnected");
     });
     client.on('error',function(err){ 
-        console.log(err); 
+        console.log('err'); 
     }) 
 }
 
@@ -111,7 +111,6 @@ heart.createEvent(1,(count,last)=>{
     register().end();
 })
 
-//Format the request and ends it
 //UDP-P2P-Listener
 
 const rl = readline.createInterface({
@@ -124,7 +123,14 @@ server.on('message', function (message, remote) {
     if ('from' in datos){
         let date = new Date(parseInt(datos.timestamp)+datos.offset),
         udpName = datos.from;
-        console.log("["+date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds()+"]"+datos.from+":"+datos.message);
+        upperName = datos.from.charAt(0).toUpperCase() + datos.from.slice(1)
+        console.log("["+date.getDay().toString().padStart(2,'0')+
+        "/"+date.getMonth().toString().padStart(2,'0')+
+        "/"+date.getFullYear()+
+        " "+date.getHours().toString().padStart(2,'0')+
+        ":"+date.getMinutes().toString().padStart(2,'0')+
+        ":"+date.getSeconds().toString().padStart(2,'0')+
+        "] "+upperName+": "+datos.message);
         //console.log(dia/mes/año hora:minutos:segundos "mensaje")
     }
 });
