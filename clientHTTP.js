@@ -10,7 +10,7 @@ var MPORT = 33333;
 var MHOST = '192.168.0.12';
 //HTTP Server Data
 var SPORT = 8080;
-var SHOST = '192.168.0.7';
+var SHOST = '192.168.0.138';
 //UDP Server Data
 var UPORT = 33335;
 var UHOST = '192.168.0.12';
@@ -93,9 +93,10 @@ const rl = readline.createInterface({
 var server = dgram.createSocket('udp4');
 server.on('message', function (message, remote) {
     var datos = JSON.parse(message);
-    if ('username' in datos){
-        udpName = datos.username;
-        console.log("Conected with: "+datos.username+" in: "+remote.address+":"+remote.port+":"+datos.msg);
+    if ('from' in datos){
+        let date = new Date(new Date(datos.timestamp).getTime()+datos.offset),
+        udpName = datos.from;
+        console.log("["+date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds()+"]"+datos.from+":"+datos.message);
         //console.log(dia/mes/año hora:minutos:segundos "mensaje")
     }
 });
@@ -104,27 +105,28 @@ server.bind(UPORT, UHOST);
 var client = dgram.createSocket('udp4');
 console.log("Type /All to send a global message, /exit to exit the chat");
 rl.on('line',(answer)=>{
-    if (answer == '/All'){
+    if (answer.toLowerCase() == '/all'){
         rl.question('Mensaje->[All]:',(answer)=>{
             var message = JSON.stringify({
-                msg : answer,
-                username : username
                 //asi deberias ser el formato de envio de mensaje ->
-                //from:
-                //to:
-                //message:
-                //timestamp:
-                //offset:
+                from: username,
+                to : 'all',
+                message: answer,
+                timestamp: (new Date()).toString(),
+                offset: ServerOffset
             });
             clientesConectados.forEach(element => {
                 client.send(message, 0, message.length, UPORT, element.ip, function(err, bytes) {
                     if (err) throw err;
-                    client.close();
+                    
                 });
             });
         });
     }else{
-        if (answer == '/exit')
+        if (answer == '/exit'){
+            client.close();
             rl.close();
+        }
+            
     }
 });
