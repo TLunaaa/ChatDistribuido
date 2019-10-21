@@ -120,7 +120,7 @@ const rl = readline.createInterface({
 var server = dgram.createSocket('udp4');
 server.on('message', function (message, remote) {
     var datos = JSON.parse(message);
-    if ('from' in datos){
+    if (datos.to == 'all' || datos.to == username){
         let date = new Date(parseInt(datos.timestamp)+datos.offset),
         udpName = datos.from;
         upperName = datos.from.charAt(0).toUpperCase() + datos.from.slice(1)
@@ -157,27 +157,57 @@ rl.on('line',(answer)=>{
             });
         });
     }else{
-        if (answer == '/netstat'){
+        if (answer.toLowerCase() == '/netstat'){
             console.log('Delay: '+ServerDelay+"ms | Offset: "+ServerOffset+"ms.");
         }
         else{
-            if (answer == '/con')
+            if (answer.toLowerCase() == '/con')
                 showConectados();
             else{
-                if (answer == '/exit'){
+                if (answer.toLowerCase() == '/exit'){
                     client.close();
                     rl.close();
                     heart.kill();
                     server.close();
                 }
                 else{
-                    if (answer == '/help'){
+                    if (answer.toLowerCase() == '/help'){
+                        console.log("  /dm to send a direct message to a connected user");
                         console.log("  /all to send a global message");
                         console.log("  /con to see online users");
                         console.log("  /netstat to see network stats");
                         console.log("  /exit to end program.");
-                    }else
-                        console.log("Error -> Unknown command: "+answer);
+                    }else{
+                        if(answer.toLowerCase()== '/dm'){
+                           rl.question("to:",(answer)=>{
+                               var towho = answer;
+                               var isConnected = false;
+                               rl.question("->["+answer+"]:",(answer)=>{
+                                    var message = JSON.stringify({
+                                        from: username,
+                                        to : towho,
+                                        message: answer,
+                                        timestamp: (new Date()).getTime(),
+                                        offset: ServerOffset
+                                    });
+                                    clientesConectados.forEach(element => {
+                                        if(element.ip != MHOST && element.username.toLowerCase() == towho.toLowerCase()){
+                                            isConnected = true;
+                                            client.send(message, 0, message.length, UPORT, element.ip, function(err, bytes) {
+                                                if (err) throw err;
+                                            });
+                                        }
+                                        if(!isConnected){
+                                            console.log("Error -> User <"+towho+"> not connected: ");
+                                        } 
+                                    });
+                                });
+                            });
+                        }else{
+                            console.log("Error -> Unknown command: "+answer);
+                        }
+                        
+                    }
                 }
 
             }
