@@ -4,16 +4,17 @@ const dgram = require('dgram');
 const heartbeats = require('heartbeats');
 const readlinesync = require('readline-sync');
 const readline = require('readline');
+const os = require( 'os' );
 
 //Client Data
 var MPORT = 33333;
-var MHOST = '192.168.0.12';
+var MHOST = getLocalIP()[0].toString();
 //HTTP Server Data
 var SPORT = 8080;
-var SHOST = '192.168.0.138';
+var SHOST = '192.168.0.252';
 //UDP Server Data
 var UPORT = 33335;
-var UHOST = '192.168.0.12';
+var UHOST = getLocalIP()[0].toString();
 //Variables
 var heart = heartbeats.createHeart(10000);
 var clientesConectados = [];
@@ -24,7 +25,6 @@ var ServerOffset;
 
 //Delay And Offset Calcuation-------------------
 var t1,t2,t3,t4;
-
 function TCPconnection(){
     var client = new net.Socket();  //Devuelve un Socket
     //console.log("Trying to connect to "+SHOST+":"+MPORT+" via TCP");
@@ -48,6 +48,20 @@ function TCPconnection(){
     client.on('error',function(err){ 
         console.log(err); 
     }) 
+}
+
+function getLocalIP() {
+    const interfaces = os.networkInterfaces();
+    const addresses = [];
+   
+    Object.keys(interfaces).forEach((netInterface) => {
+     interfaces[netInterface].forEach((interfaceObject) => {
+      if (interfaceObject.family === 'IPv4' && !interfaceObject.internal) {
+       addresses.push(interfaceObject.address);
+      }
+     });
+    });
+    return addresses;
 }
 //HTTP Register---------------------------------
 const options = {
@@ -108,7 +122,7 @@ var server = dgram.createSocket('udp4');
 server.on('message', function (message, remote) {
     var datos = JSON.parse(message);
     if ('from' in datos){
-        let date = new Date(new Date(datos.timestamp).getTime()+datos.offset),
+        let date = new Date(parseInt(datos.timestamp)+datos.offset),
         udpName = datos.from;
         console.log("["+date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds()+"]"+datos.from+":"+datos.message);
         //console.log(dia/mes/año hora:minutos:segundos "mensaje")
@@ -117,7 +131,7 @@ server.on('message', function (message, remote) {
 server.bind(UPORT, UHOST);
 //UDP-P2P-Sender
 var client = dgram.createSocket('udp4');
-console.log("Type /all to send a global message, /exit to exit the chat or /conectados to see online users.");
+console.log("Type /all to send a global message, /exit to exit the chat or /con to see online users.");
 rl.on('line',(answer)=>{
     if (answer.toLowerCase() == '/all'){
         rl.question('Mensaje->[All]:',(answer)=>{
@@ -125,7 +139,7 @@ rl.on('line',(answer)=>{
                 from: username,
                 to : 'all',
                 message: answer,
-                timestamp: (new Date()).toString(),
+                timestamp: (new Date()).getTime(),
                 offset: ServerOffset
             });
             clientesConectados.forEach(element => {
@@ -142,7 +156,7 @@ rl.on('line',(answer)=>{
             rl.close();
         }
         else{
-            if (answer == '/conectados')
+            if (answer == '/con')
                 showConectados();
             else
                 console.log("Error: Comando desconocido: "+answer);
