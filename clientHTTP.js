@@ -86,17 +86,17 @@ heart.createEvent(1,(count,last)=>{
 //Format the request and ends it
 //UDP-P2P-Listener
 
-/*const rl = readline.createInterface({
+const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
-
 var server = dgram.createSocket('udp4');
 server.on('message', function (message, remote) {
     var datos = JSON.parse(message);
     if ('username' in datos){
         udpName = datos.username;
         console.log("Conected with: "+datos.username+" in: "+remote.address+":"+remote.port+":"+datos.msg);
+        //console.log(dia/mes/año hora:minutos:segundos "mensaje")
     }
 });
 server.bind(UPORT, UHOST);
@@ -108,6 +108,11 @@ rl.question('¿Desea enviar?',answer=>{
             var message = JSON.stringify({
                 msg : answer,
                 username : username
+                //from:
+                //to:
+                //message:
+                //timestamp:
+                //offset:
             });
             clientesConectados.forEach(element => {
                 client.send(message, 0, message.length, UPORT, element.ip, function(err, bytes) {
@@ -118,6 +123,4 @@ rl.question('¿Desea enviar?',answer=>{
         });
     };
 });
-
 rl.close();
-*/
