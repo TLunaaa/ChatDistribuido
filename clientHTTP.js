@@ -152,10 +152,6 @@ rl.on('line',(answer)=>{
                 if(element.ip != MHOST){
                     client.send(message, 0, message.length, UPORT, element.ip, function(err, bytes) {
                         if (err) throw err;
-<<<<<<< refs/remotes/origin/master
-                        client.close();
-=======
->>>>>>> ultimate push
                     });
                 }
             });
