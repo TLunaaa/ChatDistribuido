@@ -10,7 +10,7 @@ var MPORT = 33333;
 var MHOST = '192.168.0.12';
 //HTTP Server Data
 var SPORT = 8080;
-var SHOST = '192.168.0.138';
+var SHOST = '192.168.0.7';
 //UDP Server Data
 var UPORT = 33335;
 var UHOST = '192.168.0.12';
@@ -109,6 +109,7 @@ rl.on('line',(answer)=>{
             var message = JSON.stringify({
                 msg : answer,
                 username : username
+                //asi deberias ser el formato de envio de mensaje ->
                 //from:
                 //to:
                 //message:
