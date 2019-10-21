@@ -51,9 +51,6 @@ function getURL(pathurl){
             if(esta == false){
                 clientesActivos.push(cliente);
             }
-            /*clientesActivos.forEach((element)=>{
-                console.log(element);
-            })*/
         }
     }
 }

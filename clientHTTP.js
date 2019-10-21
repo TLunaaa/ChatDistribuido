@@ -7,13 +7,13 @@ const readline = require('readline');
 
 //Client Data
 var MPORT = 33333;
-var MHOST = '192.168.0.123';
+var MHOST = '192.168.0.147';
 //HTTP Server Data
 var SPORT = 8080;
 var SHOST = '192.168.0.65';
 //UDP Server Data
 var UPORT = 33335;
-var UHOST = '192.168.0.123';
+var UHOST = '192.168.0.147';
 //Variables
 var heart = heartbeats.createHeart(10000);
 var clientesConectados = [];
@@ -29,12 +29,12 @@ function TCPconnection(){
     var client = new net.Socket();  //Devuelve un Socket
     console.log("Trying to connect to "+SHOST+":"+MPORT+" via TCP");
     client.connect(33333,SHOST, function() {
-        console.log("Connection established");
+        console.log(">>Connection established");
         t1 = new Date().getTime();
         client.write(t1.toString());
     }); 
     client.on('data', function(data) {
-        console.log("Receiving Data");
+        console.log(">Receiving Data");
         t4 = (new Date()).getTime();
         t2 = data.toString().split(',')[0];
         t3 = data.toString().split(',')[1];
@@ -43,7 +43,7 @@ function TCPconnection(){
         ServerDelay  = ((parseInt(t2)-parseInt(t1))+(parseInt(t4)-parseInt(t3)))/2;
         console.log("Offset:"+ServerOffset+" Delay:"+ServerDelay);
         client.destroy();
-        console.log("Disconnected");
+        console.log(">>Disconnected");
     });
 }
 //HTTP Register---------------------------------
@@ -77,19 +77,20 @@ function register(){
 username = readlinesync.question('Ingrese su nombre de usuario: ');
 console.log("Bienvenido "+username);
 options.path = '/register?username='+username+'&ip='+MHOST+'&port='+SPORT;
-//register().end();
+TCPconnection();
+register().end();
 heart.createEvent(1,(count,last)=>{
-    //register().end();
+    register().end();
 })
-
-//TODO connect with all clients.
-
-//TODO send message - read message.
-
-
 
 //Format the request and ends it
 //UDP-P2P-Listener
+
+/*const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
 var server = dgram.createSocket('udp4');
 server.on('message', function (message, remote) {
     var datos = JSON.parse(message);
@@ -101,19 +102,22 @@ server.on('message', function (message, remote) {
 server.bind(UPORT, UHOST);
 //UDP-P2P-Sender
 var client = dgram.createSocket('udp4');
-udpmsg = readline.question('¿Desea enviar?');
-if (udpmsg == '1'){
-
-    var message = JSON.stringify({
-        msg : readline.question('Mensaje->[All]:'),
-        username : username
-    });
-    clientesConectados.forEach(element => {
-        client.send(message, 0, message.length, UPORT, element.ip, function(err, bytes) {
-            if (err) throw err;
-            client.close();
+rl.question('¿Desea enviar?',answer=>{
+    if (answer == '1'){
+        rl.question('Mensaje->[All]:',(answer)=>{
+            var message = JSON.stringify({
+                msg : answer,
+                username : username
+            });
+            clientesConectados.forEach(element => {
+                client.send(message, 0, message.length, UPORT, element.ip, function(err, bytes) {
+                    if (err) throw err;
+                    client.close();
+                });
+            });
         });
-    });
-}
+    };
+});
 
-
+rl.close();
+*/
