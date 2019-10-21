@@ -45,6 +45,9 @@ function TCPconnection(){
         client.destroy();
         //console.log(">>Disconnected");
     });
+    client.on('error',function(err){ 
+        console.log(err); 
+    }) 
 }
 //HTTP Register---------------------------------
 const options = {
@@ -69,6 +72,9 @@ function register(){
           });
         res.on('end', () => {
         //console.log('Register Closed');
+        });
+        res.on('error',err =>{ 
+            console.log(err); 
         });
     });
     return req;
@@ -97,7 +103,7 @@ heart.createEvent(1,(count,last)=>{
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
-  });
+});
 var server = dgram.createSocket('udp4');
 server.on('message', function (message, remote) {
     var datos = JSON.parse(message);
@@ -123,9 +129,11 @@ rl.on('line',(answer)=>{
                 offset: ServerOffset
             });
             clientesConectados.forEach(element => {
-                client.send(message, 0, message.length, UPORT, element.ip, function(err, bytes) {
-                    if (err) throw err;
-                });
+                if(element.ip != MHOST){
+                    client.send(message, 0, message.length, UPORT, element.ip, function(err, bytes) {
+                        if (err) throw err;
+                    });
+                }
             });
         });
     }else{
