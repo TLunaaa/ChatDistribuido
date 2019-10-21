@@ -99,15 +99,15 @@ function showConectados(){
     clientesConectados.forEach(element => {
         s+=element.username.toString()+", ";
     });
-    console.log("Conectados: "+s);
+    console.log("Connected users: "+s);
 }
 
-username = readlinesync.question('Ingrese su nombre de usuario: ');
-console.log("Bienvenido "+username);
+username = readlinesync.question('Enter your username: ');
 options.path = '/register?username='+username+'&ip='+MHOST+'&port='+SPORT;
 TCPconnection();
 register().end();
 heart.createEvent(1,(count,last)=>{
+    TCPconnection();
     register().end();
 })
 
@@ -137,10 +137,10 @@ server.on('message', function (message, remote) {
 server.bind(UPORT, UHOST);
 //UDP-P2P-Sender
 var client = dgram.createSocket('udp4');
-console.log("Type /all to send a global message, /con to see online users or /netstat to see network stats.");
+console.log("Welcome "+username+", type /help to see all commands.");
 rl.on('line',(answer)=>{
     if (answer.toLowerCase() == '/all'){
-        rl.question('Mensaje->[All]:',(answer)=>{
+        rl.question('->[All]:',(answer)=>{
             var message = JSON.stringify({
                 from: username,
                 to : 'all',
@@ -158,15 +158,29 @@ rl.on('line',(answer)=>{
         });
     }else{
         if (answer == '/netstat'){
-            //client.close();
-            //rl.close();
             console.log('Delay: '+ServerDelay+"ms | Offset: "+ServerOffset+"ms.");
         }
         else{
             if (answer == '/con')
                 showConectados();
-            else
-                console.log("Error: Comando desconocido: "+answer);
+            else{
+                if (answer == '/exit'){
+                    client.close();
+                    rl.close();
+                    heart.kill();
+                    server.close();
+                }
+                else{
+                    if (answer == '/help'){
+                        console.log("  /all to send a global message");
+                        console.log("  /con to see online users");
+                        console.log("  /netstat to see network stats");
+                        console.log("  /exit to end program.");
+                    }else
+                        console.log("Error -> Unknown command: "+answer);
+                }
+
+            }
         }
             
     }

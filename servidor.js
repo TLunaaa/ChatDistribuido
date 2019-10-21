@@ -46,6 +46,7 @@ function getURL(pathurl){
                 if(element.ip == ip ){
                     esta = true;
                     element.timestamp = (new Date()).getTime();
+                    element.username = username;
                 }
             })
             if(esta == false){
