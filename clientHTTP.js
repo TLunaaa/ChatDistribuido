@@ -7,13 +7,13 @@ const readline = require('readline');
 
 //Client Data
 var MPORT = 33333;
-var MHOST = '192.168.0.147';
+var MHOST = '192.168.0.12';
 //HTTP Server Data
 var SPORT = 8080;
-var SHOST = '192.168.0.65';
+var SHOST = '192.168.0.138';
 //UDP Server Data
 var UPORT = 33335;
-var UHOST = '192.168.0.147';
+var UHOST = '192.168.0.12';
 //Variables
 var heart = heartbeats.createHeart(10000);
 var clientesConectados = [];
@@ -57,9 +57,9 @@ const options = {
     }
 }
 function register(){
-    console.log("Trying to connect to "+SHOST+":"+SPORT);
+    //console.log("Trying to connect to "+SHOST+":"+SPORT);
     req = http.request(options, (res) => {
-        console.log(`statusCode: ${res.statusCode}`)
+        //console.log(`statusCode: ${res.statusCode}`)
         res.setEncoding('utf8');
         clientesConectados = [];
         res.on('data', (chunk) => {
@@ -68,7 +68,7 @@ function register(){
             });
           });
         res.on('end', () => {
-        console.log('Register Closed');
+        //console.log('Register Closed');
         });
     });
     return req;
@@ -102,8 +102,9 @@ server.on('message', function (message, remote) {
 server.bind(UPORT, UHOST);
 //UDP-P2P-Sender
 var client = dgram.createSocket('udp4');
-rl.question('¿Desea enviar?',answer=>{
-    if (answer == '1'){
+console.log("Type /All to send a global message, /exit to exit the chat");
+rl.on('line',(answer)=>{
+    if (answer == '/All'){
         rl.question('Mensaje->[All]:',(answer)=>{
             var message = JSON.stringify({
                 msg : answer,
@@ -121,6 +122,8 @@ rl.question('¿Desea enviar?',answer=>{
                 });
             });
         });
-    };
+    }else{
+        if (answer == '/exit')
+            rl.close();
+    }
 });
-rl.close();

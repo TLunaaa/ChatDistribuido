@@ -1,6 +1,6 @@
 var net  = require('net');
 
-const HOST = '192.168.0.147';
+const HOST = '192.168.0.12';
 const PORT = 33333;
 
 var server = net.createServer(function(socket){
@@ -10,7 +10,7 @@ var server = net.createServer(function(socket){
         socket.write(T2.toString()+','+T3.toString());
     })
     socket.on('close',function(data){
-        server.close();
+        //server.close();
     })
 })
 server.listen(PORT,HOST);
