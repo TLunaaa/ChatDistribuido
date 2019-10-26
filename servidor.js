@@ -13,7 +13,7 @@ var clientesActivos = new List();
 
 app.get('/register', function (req, res) {
     console.log('>Conexion establecida con: '+ req.socket.remoteAddress);
-    getURL(req.url,res);
+    getURL(req.url);
     let data = JSON.parse(JSON.stringify(clientesActivos));
     res.json(data);
 });
@@ -29,7 +29,7 @@ app.get('/request', function (req, res) {
     }
     catch (e) {
         console.log(e);
-        res.writeHead(404);
+        res.set(404);
         res.send(formatHTML());
     }
 });
@@ -50,30 +50,28 @@ heart.createEvent(1,(count,last)=>{
     })
 })
 
-function getURL(pathurl,res){
+function getURL(pathurl){
     if(typeof pathurl === 'string'){
         parsedURL = url.parse(pathurl);
-        if(parsedURL.pathname == '/register'){
-            let username = (parsedURL.query.split('&')[0]).split('=')[1];
-            let ip = (parsedURL.query.split('&')[1]).split('=')[1];
-            let port = (parsedURL.query.split('&')[2]).split('=')[1];
-            cliente = {
-                username : username,
-                ip: ip,
-                port : port,
-                timestamp: (new Date()).getTime(),
+        let username = (parsedURL.query.split('&')[0]).split('=')[1];
+        let ip = (parsedURL.query.split('&')[1]).split('=')[1];
+        let port = (parsedURL.query.split('&')[2]).split('=')[1];
+        cliente = {
+            username : username,
+            ip: ip,
+            port : port,
+            timestamp: (new Date()).getTime(),
+        }
+        let esta = false;
+        clientesActivos.forEach(element=>{
+            if(element.ip == ip ){
+                esta = true;
+                element.timestamp = (new Date()).getTime();
+                element.username = username;
             }
-            let esta = false;
-            clientesActivos.forEach(element=>{
-                if(element.ip == ip ){
-                    esta = true;
-                    element.timestamp = (new Date()).getTime();
-                    element.username = username;
-                }
-            })
-            if(esta == false){
-                clientesActivos.push(cliente);
-            }
+        })
+        if(esta == false){
+            clientesActivos.push(cliente);
         }
     }
 }
@@ -82,6 +80,7 @@ function formatHTML() {
     var respuesta = `<!DOCTYPE html>
     <html>
     <head>
+    <title>Users - Chat Distribuido</title>
     <style>
     table {
       font-family: arial, sans-serif;
