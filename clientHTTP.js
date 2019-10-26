@@ -11,7 +11,7 @@ var MPORT = 33333;
 var MHOST = getLocalIP()[0].toString();
 //HTTP Server Data
 var SPORT = 8080;
-var SHOST = '192.168.43.90';
+var SHOST = 'localhost';
 //UDP Server Data
 var UPORT = 33335;
 var UHOST = getLocalIP()[0].toString();
@@ -46,7 +46,7 @@ function TCPconnection(){
         //console.log(">>Disconnected");
     });
     client.on('error',function(err){ 
-        console.log('err'); 
+        console.log(err); 
     }) 
 }
 
@@ -67,11 +67,7 @@ function getLocalIP() {
 const options = {
     hostname: SHOST,
     port: SPORT,
-    method: 'GET',
-    headers: {
-        'Content-Type': 'text/plain',
-        'Content-Length': 3
-    }
+    method: 'GET'
 }
 function register(){
     //console.log("Trying to connect to "+SHOST+":"+SPORT);
@@ -197,10 +193,14 @@ rl.on('line',(answer)=>{
                                                 if (err) throw err;
                                             });
                                         }
-                                        if(!isConnected){
-                                            console.log("Error -> User <"+towho+"> not connected: ");
-                                        } 
+                                       
                                     });
+                                    if(!isConnected){
+                                        if (towho.toLowerCase()!=username.toLowerCase())
+                                            console.log("Error -> User <"+towho+"> not connected: ");
+                                        else
+                                            console.log("Error -> You can't send DM to yourself: ");
+                                    } 
                                 });
                             });
                         }else{

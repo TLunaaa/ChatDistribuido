@@ -3,18 +3,40 @@ const net = require('./servidor-net');
 const url = require('url');
 const heartbeat = require('heartbeats');
 const List = require('collections/list')
+var express = require('express');
+var app = express();
+
+const PORT = 8080;
 
 var clientesActivos = new List();
 
-const server = http.createServer((request,response) => {
-    console.log('>Conexion establecida con: '+ request.socket.remoteAddress);
-   if(request.method === 'GET'){
-        response.statusCode = 200;
-        getURL(request.url,response)
-        let data = JSON.stringify(clientesActivos);
-        response.end(data);
-   }
-}).listen(8080);
+
+app.get('/register', function (req, res) {
+    console.log('>Conexion establecida con: '+ req.socket.remoteAddress);
+    getURL(req.url,res);
+    let data = JSON.parse(JSON.stringify(clientesActivos));
+    res.json(data);
+});
+
+app.get('/request', function (req, res) {
+    try {
+        res.writeHead(200,
+            {
+                'Date': (new Date()).toString(),
+                'Content-Type': 'text/html',
+            });
+        res.send(formatHTML());
+    }
+    catch (e) {
+        console.log(e);
+        res.writeHead(404);
+        res.send(formatHTML());
+    }
+});
+
+app.listen(PORT, function () {
+    console.log('Example app listening on port '+PORT+'!');
+});
 
 var heart = heartbeat.createHeart(5000);
 heart.createEvent(1,(count,last)=>{
@@ -51,20 +73,6 @@ function getURL(pathurl,res){
             })
             if(esta == false){
                 clientesActivos.push(cliente);
-            }
-        }else if (parsedURL.pathname == '/request') {
-            try {
-                res.writeHead(200,
-                    {
-                        'Date': (new Date()).toString(),
-                        'Content-Type': 'text/html',
-                    });
-                res.end(resHTML());
-            }
-            catch (e) {
-                console.log(e);
-                res.writeHead(404);
-                res.end(formatHTML());
             }
         }
     }
