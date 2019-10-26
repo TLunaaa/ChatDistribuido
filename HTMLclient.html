@@ -4,12 +4,12 @@
                 
         </div>
         <script>
-            const HOST = "192.168.0.2";
+            const HOST = "192.168.1.7";
             const PORT = "8080";
             var clientesConectados = [];
             var xmlHttp = new XMLHttpRequest();
             //var url =  HOST + ":" + PORT +"/request";
-            var url = 'http://192.168.0.2:8080/request';
+            var url = HOST+':'+PORT+'/request';
             xmlHttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                 // Typical action to be performed when the document is ready:

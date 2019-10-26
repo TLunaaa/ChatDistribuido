@@ -20,7 +20,7 @@ app.get('/register', function (req, res) {
 
 app.get('/request', function (req, res) {
     try {
-        res.writeHead(200,
+        res.set(
             {
                 'Date': (new Date()).toString(),
                 'Content-Type': 'text/html',
