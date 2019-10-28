@@ -1,6 +1,6 @@
 var net  = require('net');
 
-const HOST = '192.168.0.2';
+const HOST = '192.168.43.37';
 const PORT = 33333;
 
 var server = net.createServer(function(socket){
@@ -8,6 +8,9 @@ var server = net.createServer(function(socket){
         var T2 = (new Date()).getTime();
         var T3 = (new Date()).getTime();    
         socket.write(T2.toString()+','+T3.toString());
+    })
+    socket.on('error',function(data){
+        
     })
     socket.on('close',function(data){
         //server.close();

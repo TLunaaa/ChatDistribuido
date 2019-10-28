@@ -11,7 +11,7 @@ var MPORT = 33333;
 var MHOST = getLocalIP()[0].toString();
 //HTTP Server Data
 var SPORT = 8080;
-var SHOST = 'localhost';
+var SHOST = '192.168.43.37';
 //UDP Server Data
 var UPORT = 33335;
 var UHOST = getLocalIP()[0].toString();
